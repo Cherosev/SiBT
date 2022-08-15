@@ -1,0 +1,139 @@
+{
+	"compiler": {
+		"version": "0.8.7+commit.e28d00a7"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "enum WaterCoinRules.CoinTypes",
+						"name": "from_coin",
+						"type": "uint8"
+					},
+					{
+						"internalType": "enum WaterCoinRules.CoinTypes",
+						"name": "to_coin",
+						"type": "uint8"
+					}
+				],
+				"name": "checkTransferAllowed",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "a_supply_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "b_supply_",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "c_supply_",
+						"type": "uint256"
+					}
+				],
+				"name": "newSeason",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "enum WaterCoinRules.CoinTypes",
+						"name": "from_coin",
+						"type": "uint8"
+					},
+					{
+						"internalType": "enum WaterCoinRules.CoinTypes",
+						"name": "to_coin",
+						"type": "uint8"
+					},
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "value",
+						"type": "uint256"
+					}
+				],
+				"name": "transferControl",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"Code/WaterCoinRules.sol": "WaterCoinRules"
+		},
+		"evmVersion": "london",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"Code/WaterCoinRules.sol": {
+			"keccak256": "0x37eedd78d46d9a16da5d06ed0d4ec7050c348d8a544300743e10056c6b52b3df",
+			"urls": [
+				"bzz-raw://c008df976b045b2726d444ad3cd5a80419b12493366bdd97aa81edf825863002",
+				"dweb:/ipfs/QmarmWQQf7dh11qvSuBRXtrbs9rPoGT95g42YDr7WZhq77"
+			]
+		},
+		"https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/math/SafeMath.sol": {
+			"keccak256": "0x0f633a0223d9a1dcccfcf38a64c9de0874dfcbfac0c6941ccf074d63a2ce0e1e",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://864a40efcffdf408044c332a5aa38ec5618ed7b4eecb8f65faf45671bd6cdc65",
+				"dweb:/ipfs/QmQJquTMtc6fgm5JQzGdsGpA2fqBe3MHWEdt2qzaLySMdN"
+			]
+		}
+	},
+	"version": 1
+}
