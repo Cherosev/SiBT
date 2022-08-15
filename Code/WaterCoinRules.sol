@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: DIKU
 pragma solidity ^0.8.0;
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/math/SafeMath.sol";
@@ -19,21 +20,20 @@ contract WaterCoinRules {
         _owner = msg.sender;
     }
 
-    modifier transferAllowed(CoinTypes from_coin, CoinTypes to_coin, uint256 amount){
+    modifier ZoneTransferAllowed(CoinTypes from_coin, CoinTypes to_coin, uint256 amount){
         require (allowedTransfers[from_coin][to_coin] >= amount, "Amount of transfer exceeds limit across zones");
         _;
     }
 
-    function checkTransferAllowed(CoinTypes from_coin, CoinTypes to_coin) public view returns (uint256){
-        return allowedTransfers[from_coin][to_coin];
-    }
-
-    function transferControl(CoinTypes from_coin, CoinTypes to_coin, address to, uint256 value) external transferAllowed(from_coin, to_coin, value) returns (bool) {
+    function ZoneTransferControl(CoinTypes from_coin, CoinTypes to_coin, uint256 value) external ZoneTransferAllowed(from_coin, to_coin, value) returns (bool) {
         allowedTransfers[from_coin][to_coin] -= value;
         allowedTransfers[to_coin][from_coin] += value;
         return true;
     }
 
+    function checkTransferLimit(CoinTypes from_coin, CoinTypes to_coin) public view returns (uint256){
+        return allowedTransfers[from_coin][to_coin];
+    }
 
     function newSeason(uint256 a_supply_, uint256 b_supply_, uint256 c_supply_) external {
         address from = msg.sender;
