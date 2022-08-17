@@ -5,7 +5,7 @@
 // The sensor readings can be viewed in Arduino IDE. Water volume is converted to megalitres (ML) as this is a standard measure for agricultural irrigation.
 
 include <ESP8266WiFi.h>
- 
+
 // Set WiFi credentials
 #define WIFI_SSID "PlutoWifi"
 #define WIFI_PASS "PlKey13"
@@ -22,7 +22,7 @@ unsigned long vol = 0;                                 // flowrate
 
 void ICACHE_RAM_ATTR pulseCounter()                    // flowrate
 {
-  pulseCount++;                                      
+  pulseCount++;
 }
 
 
@@ -30,7 +30,7 @@ void setup() {
 
 // Begin WiFi
   WiFi.begin(WIFI_SSID, WIFI_PASS);
- 
+
   // Connecting to WiFi...
   Serial.print("Connecting to ");
   Serial.print(WIFI_SSID);
@@ -59,18 +59,18 @@ void setup() {
 void loop() {
 
 // Flowrate
- 
+
   delay(1000);                                          // flowrate
   detachInterrupt(PULSE_PIN);                           // flowrate
   flowRate = (pulseCount * 2.25);                       // flowrate: pulses per second multiply by 2.25mL
   flowRate = flowRate * 60;                             // flowrate: seconds to minutes = mL / Minute
   flowRate = flowRate / 1000;                           // flowrate: mL to L = L/min
-  vol+=flowRate;                                        // flowrate: volume  
+  vol+=flowRate;                                        // flowrate: volume
   pulseCount = 0;                                       // flowrate: reset (needs to be under vol + flowrate)
-  attachInterrupt(PULSE_PIN, pulseCounter, FALLING);    // flowrate: reset  
+  attachInterrupt(PULSE_PIN, pulseCounter, FALLING);    // flowrate: reset
 
 //Serial monitor
- 
+
     Serial.print(int(flowRate),DEC);                    // flowrate: flowrate (L/min)
     Serial.print(',');
     Serial.print(vol,DEC);                              // flowrate: volume (mL) milliliter
