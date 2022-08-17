@@ -4,14 +4,14 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.0.0/contr
 import "./WaterCoin.sol";
 
 
-contract Zone_C_Coin is IERC20, WaterCoin {
+contract Zone_B_Coin is IERC20, WaterCoin {
 
     string _name;
     string _symbol;
 
     constructor () {
-        _name = "Zone C Coin";
-        _symbol = "WCC";
+        _name = "Zone B Coin";
+        _symbol = "WBC";
     }
 
     function name() public view virtual returns (string memory) {
