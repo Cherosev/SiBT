@@ -1,23 +1,21 @@
 // SPDX-License-Identifier: DIKU
 pragma solidity ^0.8.0;
 
+import "./CertifiedUsers.sol";
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/math/SafeMath.sol";
 
-contract WaterCoin {
+contract WaterCoin is CertifiedUsers {
 
     enum CoinTypes{Zone_A, Zone_B, Zone_C}
 
     mapping (CoinTypes => uint256) _supply;
 
-
+    mapping (address => mapping (CoinTypes => uint256))   _lockedFunds;
     mapping (address => mapping (CoinTypes => uint256))   _balances;
     mapping (CoinTypes => mapping (CoinTypes => uint256)) _zoneAllowedTransfers;
     mapping (address => mapping (address => mapping (CoinTypes => uint256))) _allowances;
 
-    address _owner;
-
     constructor() {
-        _owner = msg.sender;
     }
 
     modifier ZoneTransferAllowed(CoinTypes from_coin, CoinTypes to_coin, uint256 amount){
@@ -43,7 +41,7 @@ contract WaterCoin {
         return _balances[_person][coin];
     }
 
-    function _approve(address owner, address spender, uint256 amount, CoinTypes coin) internal virtual {
+    function _approve(address owner, address spender, uint256 amount, CoinTypes coin) internal isCertified(spender) virtual {
         require(owner != address(0), "WaterCoin: approve from the zero address");
         require(spender != address(0), "WaterCoin: approve to the zero address");
 
@@ -59,7 +57,7 @@ contract WaterCoin {
         _;
     }
 
-    function _transfer(address to, uint256 amount, CoinTypes coin) internal sufficientFunds(msg.sender, amount, coin) returns (bool){
+    function _transfer(address to, uint256 amount, CoinTypes coin) internal sufficientFunds(msg.sender, amount, coin) isCertified(to) returns (bool){
         address from = msg.sender;
 
         _balances[from][coin] -= amount;
@@ -77,12 +75,7 @@ contract WaterCoin {
         return true;
     }
 
-    modifier onlyOwner(){
-        require (msg.sender == _owner, "Owner-only function");
-        _;
-    }
-
-    function _mint(address account, uint256 amount, CoinTypes coin) internal onlyOwner() virtual returns (bool) {
+    function _mint(address account, uint256 amount, CoinTypes coin) internal onlyOwner() isCertified(account) virtual returns (bool) {
         require(account != address(0), "ERC20: mint to the zero address");
 
         _supply[coin] += amount;
@@ -97,6 +90,35 @@ contract WaterCoin {
         require(accountBalance >= amount, "WaterCoin: burn amount exceeds balance");
         _balances[account][coin] = accountBalance - amount;
         _supply[coin] -= amount;
+    }
+
+    // Burns all coins from a given user.
+    function burnAccount(address account) private onlyOwner(){
+        uint256 a_balance = _balances[account][CoinTypes.Zone_A];
+        uint256 b_balance = _balances[account][CoinTypes.Zone_B];
+        uint256 c_balance = _balances[account][CoinTypes.Zone_C];
+
+        _burn(account, a_balance, CoinTypes.Zone_A);
+        _burn(account, b_balance, CoinTypes.Zone_B);
+        _burn(account, c_balance, CoinTypes.Zone_C);
+    } 
+
+    // Burn all coins of all certified users.
+    function burnAll() external onlyOwner() {
+        for (uint256 i=0; i< _certifiedUsers.length; i++){
+            address account = _certifiedUsers[i].account;
+            burnAccount(account);
+        }
+    }
+
+    function removeUser(string memory name) private onlyOwner(){
+        address account = CertifiedUsers.companyAccount(name);
+        burnAccount(account);
+        CertifiedUsers._removeUser(name);
+    }
+
+    function certifyUser(string memory name, address account) external onlyOwner(){
+        CertifiedUsers._certifyUser(name, account);
     }
 
     function _totalSupply(CoinTypes coin) internal view returns (uint256) {

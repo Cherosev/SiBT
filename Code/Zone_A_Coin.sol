@@ -56,8 +56,8 @@ contract Zone_A_Coin is IERC20, WaterCoin {
     }
 
     function convertToZone(CoinTypes to_coin, uint256 amount) external virtual returns (bool) {
-        address from = msg.sender;
-        return WaterCoin.ZoneTransfer(CoinTypes.Zone_A, to_coin, from, amount);
+        address account = msg.sender;
+        return WaterCoin.ZoneTransfer(CoinTypes.Zone_A, to_coin, account, amount);
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
