@@ -4,14 +4,17 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.0.0/contr
 import "./WaterCoin.sol";
 
 
-contract Zone_B_Coin is IERC20, WaterCoin {
+contract Zone_B_Coin is IERC20 {
+
+    WaterCoin wc;
 
     string _name;
     string _symbol;
 
     constructor () {
-        _name = "Zone B Coin";
-        _symbol = "WBC";
+        _name = "Zone A Coin";
+        _symbol = "WAC";
+        wc = WaterCoin(0x9a2E12340354d2532b4247da3704D2A5d73Bd189);
     }
 
     function name() public view virtual returns (string memory) {
@@ -27,63 +30,63 @@ contract Zone_B_Coin is IERC20, WaterCoin {
     }
 
     function totalSupply() external view override returns (uint256) {
-        return WaterCoin._totalSupply(CoinTypes.Zone_C);
+        return wc._totalSupply(1);
     }
 
     function balanceOf(address account) public view override returns (uint256) {
-        return WaterCoin.checkBalance(account, CoinTypes.Zone_C);
+        return wc.checkBalance(account, 1);
     }
 
     function transfer(address recipient, uint256 amount) public override returns (bool) {
-        return WaterCoin._transfer(recipient, amount, WaterCoin.CoinTypes.Zone_C);
+        return wc.transfer(recipient, amount, 1);
     }
 
     function allowance(address owner, address spender) public view override returns (uint256) {
-        return WaterCoin.checkAllowance(owner, spender, CoinTypes.Zone_C);
+        return wc.checkAllowance(owner, spender, 1);
     }
 
     function approve(address spender, uint256 amount) public virtual override returns (bool) {
         address from = msg.sender;
-        WaterCoin._approve(from, spender, amount, CoinTypes.Zone_C);
+        wc.approve(from, spender, amount, 1);
         emit Approval(from, spender, amount);
         return true;
     }
 
     function transferFrom(address sender, address recipient, uint256 amount) public virtual override returns (bool) {
-        WaterCoin._transferFrom(sender, recipient, amount, CoinTypes.Zone_C);
+        wc.transferFrom(sender, recipient, amount, 1);
         emit Approval(sender, recipient, amount);
         return true;
     }
 
-    function convertToZone(CoinTypes to_coin, uint256 amount) external virtual returns (bool) {
+    function convertToZone(uint to_coin, uint256 amount) external virtual returns (bool) {
         address account = msg.sender;
-        return WaterCoin.ZoneTransfer(CoinTypes.Zone_C, to_coin, account, amount);
+        return wc.ZoneTransfer(1, to_coin, account, amount);
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
         address from = msg.sender;
-        uint256 currentAllowance = WaterCoin.checkAllowance(from, spender, CoinTypes.Zone_C);
-        WaterCoin._approve(from, spender, currentAllowance + addedValue, CoinTypes.Zone_C);
+        uint256 currentAllowance = wc.checkAllowance(from, spender, 1);
+        wc.approve(from, spender, currentAllowance + addedValue, 1);
         return true;
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
         address from = msg.sender;
-        uint256 currentAllowance = WaterCoin.checkAllowance(from, spender, CoinTypes.Zone_C);
+        uint256 currentAllowance = wc.checkAllowance(from, spender, 1);
         require(currentAllowance >= subtractedValue, "WaterCoin: decreased allowance below zero");
-        WaterCoin._approve(from, spender, currentAllowance - subtractedValue, CoinTypes.Zone_C);
+        wc.approve(from, spender, currentAllowance - subtractedValue, 1);
 
         return true;
     }
 
     function mint(address account, uint256 amount) external virtual {
-        if (WaterCoin._mint(account, amount, CoinTypes.Zone_C)){
+        if (wc.mint(account, amount, 1)){
             emit Transfer(address(0), account, amount);
         }
     }
 
     function burn(address account, uint256 amount) external virtual {
-        WaterCoin._burn(account, amount, CoinTypes.Zone_C);
+        wc.burn(account, amount, 1);
         emit Transfer(account, address(0), amount);
     }
 }

@@ -18,13 +18,17 @@ contract WaterCoin is CertifiedUsers {
     constructor() {
     }
 
-    modifier ZoneTransferAllowed(CoinTypes from_coin, CoinTypes to_coin, uint256 amount){
+    modifier ZoneTransferAllowed(uint from_coin_val, uint to_coin_val, uint256 amount){
+        CoinTypes from_coin = CoinTypes(from_coin_val);
+        CoinTypes to_coin = CoinTypes(to_coin_val);
         require (from_coin != to_coin, "Cannot convert coin to same type.");
         require (_zoneAllowedTransfers[from_coin][to_coin] >= amount, "Amount of transfer exceeds limit across zones");
         _;
     }
 
-    function ZoneTransfer(CoinTypes from_coin, CoinTypes to_coin, address wallet, uint256 value) internal ZoneTransferAllowed(from_coin, to_coin, value) returns (bool) {
+    function ZoneTransfer(uint from_coin_val, uint to_coin_val, address wallet, uint256 value) external ZoneTransferAllowed(from_coin_val, to_coin_val, value) returns (bool) {
+        CoinTypes from_coin = CoinTypes(from_coin_val);
+        CoinTypes to_coin = CoinTypes(to_coin_val);
         require (_balances[wallet][from_coin] >= value, "Insufficient funds.");
         _zoneAllowedTransfers[from_coin][to_coin] -= value;
         _zoneAllowedTransfers[to_coin][from_coin] += value;
@@ -37,54 +41,61 @@ contract WaterCoin is CertifiedUsers {
         return _zoneAllowedTransfers[from_coin][to_coin];
     }
 
-    function checkBalance(address _person, CoinTypes coin) internal view returns (uint256) {
+    function checkBalance(address _person, uint coin_val) public view returns (uint256) {
+        CoinTypes coin = CoinTypes(coin_val);
         return _balances[_person][coin];
     }
 
-    function _approve(address owner, address spender, uint256 amount, CoinTypes coin) internal isCertified(spender) virtual {
+    function approve(address owner, address spender, uint256 amount, uint coin_val) public isCertified(spender) virtual {
+        CoinTypes coin = CoinTypes(coin_val);
         require(owner != address(0), "WaterCoin: approve from the zero address");
         require(spender != address(0), "WaterCoin: approve to the zero address");
 
         _allowances[owner][spender][coin] = amount;
     }
 
-    function checkAllowance(address owner, address spender, CoinTypes coin) internal view returns (uint256){
+    function checkAllowance(address owner, address spender, uint coin_val) external view returns (uint256){
+        CoinTypes coin = CoinTypes(coin_val);
         return _allowances[owner][spender][coin];
     }
 
-    modifier sufficientFunds(address owner, uint256 amount, CoinTypes coin){
+    modifier sufficientFunds(address owner, uint256 amount, uint coin_val){
+        CoinTypes coin = CoinTypes(coin_val);
         require(_balances[owner][coin] >= amount, "Insufficent funds");
         _;
     }
 
-    function _transfer(address to, uint256 amount, CoinTypes coin) internal sufficientFunds(msg.sender, amount, coin) isCertified(to) returns (bool){
+    function transfer(address to, uint256 amount, uint coin_val) external sufficientFunds(msg.sender, amount, coin_val) isCertified(to) returns (bool){
         address from = msg.sender;
-
+        CoinTypes coin = CoinTypes(coin_val);
         _balances[from][coin] -= amount;
         _balances[to][coin]   += amount;
 
         return true;
     }
 
-    function _transferFrom(address from, address to, uint256 amount, CoinTypes coin) internal sufficientFunds(from, amount, coin) returns (bool){
+    function transferFrom(address from, address to, uint256 amount, uint coin_val) external sufficientFunds(from, amount, coin_val) returns (bool){
+        CoinTypes coin = CoinTypes(coin_val);
         uint256 currentAllowance = _allowances[from][to][coin];
         require(currentAllowance >= amount, "WaterCoin: transfer amount exceeds allowance");
         _balances[from][coin] -= amount;
         _balances[to][coin]   += amount;
-        _approve(from, to, currentAllowance - amount, coin);
+        approve(from, to, currentAllowance - amount, coin_val);
         return true;
     }
 
-    function _mint(address account, uint256 amount, CoinTypes coin) internal onlyOwner() isCertified(account) virtual returns (bool) {
+    function mint(address account, uint256 amount, uint coin_val) external onlyOwner() isCertified(account) virtual returns (bool) {
         require(account != address(0), "ERC20: mint to the zero address");
+        CoinTypes coin = CoinTypes(coin_val);
 
         _supply[coin] += amount;
         _balances[account][coin] += amount;
         return true;
     }
 
-    function _burn(address account, uint256 amount, CoinTypes coin) internal onlyOwner() {
+    function burn(address account, uint256 amount, uint coin_val) public onlyOwner() {
         require(account != address(0), "WaterCoin: burn from the zero address");
+        CoinTypes coin = CoinTypes(coin_val);
 
         uint256 accountBalance = _balances[account][coin];
         require(accountBalance >= amount, "WaterCoin: burn amount exceeds balance");
@@ -98,9 +109,9 @@ contract WaterCoin is CertifiedUsers {
         uint256 b_balance = _balances[account][CoinTypes.Zone_B];
         uint256 c_balance = _balances[account][CoinTypes.Zone_C];
 
-        _burn(account, a_balance, CoinTypes.Zone_A);
-        _burn(account, b_balance, CoinTypes.Zone_B);
-        _burn(account, c_balance, CoinTypes.Zone_C);
+        burn(account, a_balance, 0); // Zone A
+        burn(account, b_balance, 1); // Zone B
+        burn(account, c_balance, 2); // Zone C
     } 
 
     // Burn all coins of all certified users.
@@ -121,7 +132,8 @@ contract WaterCoin is CertifiedUsers {
         CertifiedUsers._certifyUser(name, account);
     }
 
-    function _totalSupply(CoinTypes coin) internal view returns (uint256) {
+    function _totalSupply(uint coin_val) public view returns (uint256) {
+        CoinTypes coin = CoinTypes(coin_val);
         return _supply[coin];
     }
 

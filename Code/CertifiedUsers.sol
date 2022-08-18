@@ -31,7 +31,7 @@ contract CertifiedUsers {
     }
 
     modifier onlyOwner(){
-        require (msg.sender == _owner, "Owner-only function");
+        require (tx.origin == _owner, "Owner-only function");
         _;
     }
 
