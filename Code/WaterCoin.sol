@@ -10,7 +10,6 @@ contract WaterCoin is CertifiedUsers {
 
     mapping (CoinTypes => uint256) _supply;
 
-    mapping (address => mapping (CoinTypes => uint256))   _lockedFunds;
     mapping (address => mapping (CoinTypes => uint256))   _balances;
     mapping (CoinTypes => mapping (CoinTypes => uint256)) _zoneAllowedTransfers;
     mapping (address => mapping (address => mapping (CoinTypes => uint256))) _allowances;
@@ -137,17 +136,14 @@ contract WaterCoin is CertifiedUsers {
         return _supply[coin];
     }
 
-    function newSeason() external onlyOwner() {
+    function setBudgets() external onlyOwner() {
         uint256 a_supply_ = _supply[CoinTypes.Zone_A];
         uint256 b_supply_ = _supply[CoinTypes.Zone_B];
         //uint256 c_supply_ = _supply[CoinTypes.Zone_C]; // C-supply currently doesnt matter.
 
         _zoneAllowedTransfers[CoinTypes.Zone_A][CoinTypes.Zone_C] = a_supply_;
         _zoneAllowedTransfers[CoinTypes.Zone_B][CoinTypes.Zone_C] = b_supply_;
-        _zoneAllowedTransfers[CoinTypes.Zone_A][CoinTypes.Zone_B] = SafeMath.div(a_supply_, 2);
-        _zoneAllowedTransfers[CoinTypes.Zone_B][CoinTypes.Zone_A] = SafeMath.div(b_supply_, 2);
+        _zoneAllowedTransfers[CoinTypes.Zone_A][CoinTypes.Zone_B] = SafeMath.div(b_supply_, 2);
+        _zoneAllowedTransfers[CoinTypes.Zone_B][CoinTypes.Zone_A] = SafeMath.div(a_supply_, 2);
     }
-
-    
-
 }
